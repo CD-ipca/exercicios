@@ -112,7 +112,7 @@ const server = http.createServer((req, res) => {
         <body>
             <h1>🚀 Servidor Node.js Funcionando!</h1>
             <p>Este é meu primeiro servidor HTTP.</p>
-            <p>URL acessado: ${req.url}</p>
+            <p>URL acedido: ${req.url}</p>
             <p>Método HTTP: ${req.method}</p>
         </body>
         </html>
