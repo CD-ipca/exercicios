@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💬 Chat em Tempo Real</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 900px;
+            height: 650px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #statusConexao {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 220px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-right: 2px solid #e0e0e0;
+            overflow-y: auto;
+        }
+        .sidebar h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .usuario-online {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .usuario-online::before {
+            content: '🟢';
+            font-size: 10px;
+        }
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        #mensagens {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #fafafa;
+        }
+        #mensagens::-webkit-scrollbar {
+            width: 8px;
+        }
+        #mensagens::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+        .mensagem {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .mensagem-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        .mensagem-username {
+            font-weight: bold;
+            color: #667eea;
+        }
+        .mensagem-hora {
+            color: #999;
+        }
+        .mensagem-texto {
+            color: #333;
+            line-height: 1.4;
+        }
+        .mensagem-sistema {
+            background: #e3f2fd;
+            color: #1976d2;
+            text-align: center;
+            font-style: italic;
+            padding: 8px;
+            font-size: 13px;
+        }
+        #typing {
+            padding: 10px 20px;
+            font-style: italic;
+            color: #999;
+            min-height: 35px;
+            font-size: 13px;
+        }
+        .input-area {
+            padding: 15px 20px;
+            background: white;
+            border-top: 2px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+        #inputMsg {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        #inputMsg:focus {
+            border-color: #764ba2;
+        }
+        button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            gap: 20px;
+        }
+        .login-screen h2 {
+            color: #667eea;
+            font-size: 28px;
+        }
+        .login-screen input {
+            padding: 12px 20px;
+            width: 280px;
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+        }
+        .login-screen input:focus {
+            border-color: #764ba2;
+        }
+
+        /* Indicador de conexão */
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4caf50;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .status-dot.offline {
+            background: #f44336;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Ecrã de Login -->
+    <div id="loginScreen" class="login-screen">
+        <h2>💬 Bem-vindo ao Chat!</h2>
+        <p style="color: #666;">Entre para começar a conversar</p>
+        <input type="text" id="usernameInput" placeholder="Digite seu nome..." maxlength="20" autofocus>
+        <button onclick="entrarChat()">Entrar no Chat</button>
+    </div>
+
+    <!-- Ecrã do Chat -->
+    <div id="chatScreen" style="display: none; flex-direction: column; height: 100%;">
+        <div class="header">
+            <h2>
+                <span>💬</span>
+                <span>Chat em Tempo Real</span>
+            </h2>
+            <div id="statusConexao">
+                <span class="status-dot"></span>
+                <span>Online</span>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>👥 Online (<span id="onlineCount">0</span>)</h3>
+                <div id="listaUtilizadores"></div>
+            </div>
+            <div class="chat-area">
+                <div id="mensagens"></div>
+                <div id="typing"></div>
+                <div class="input-area">
+                    <input type="text" id="inputMsg" placeholder="Digite sua mensagem..." disabled>
+                    <button onclick="enviarMensagem()" id="btnEnviar" disabled>Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let socket;
+    let username = '';
+    let typingTimer;
+    const TYPING_TIMER_LENGTH = 1000; // 1 segundo
+
+    // SOLUÇÃO TODO 1: Função para entrar no chat
+    function entrarChat() {
+        const input = document.getElementById('usernameInput');
+        username = input.value.trim();
+
+        if (username === '') {
+            alert('Por favor, digite um nome!');
+            input.focus();
+            return;
+        }
+
+        if (username.length < 2) {
+            alert('Nome deve ter pelo menos 2 caracteres!');
+            input.focus();
+            return;
+        }
+
+        // Conectar ao Socket.IO
+        socket = io();
+
+        // Configurar eventos
+        configurarEventos();
+
+        // Emitir evento de entrada
+        socket.emit('entrar', username);
+
+        // Esconder login e mostrar chat
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('chatScreen').style.display = 'flex';
+
+        // Habilitar input e botão
+        document.getElementById('inputMsg').disabled = false;
+        document.getElementById('btnEnviar').disabled = false;
+        document.getElementById('inputMsg').focus();
+    }
+
+    // SOLUÇÃO TODO 2: Configurar listeners de eventos
+    function configurarEventos() {
+
+        // Conexão estabelecida
+        socket.on('connect', () => {
+            console.log('✅ Conectado ao servidor');
+            atualizarStatusConexao(true);
+        });
+
+        // Desconexão
+        socket.on('disconnect', () => {
+            console.log('❌ Desconectado do servidor');
+            atualizarStatusConexao(false);
+            adicionarMensagem({
+                texto: 'Conexão perdida. Tentando reconectar...'
+            }, true);
+        });
+
+        // Erro de username
+        socket.on('erroUsername', (mensagem) => {
+            alert(mensagem);
+            location.reload();
+        });
+
+        // Bem-vindo
+        socket.on('bemVindo', (data) => {
+            adicionarMensagem({
+                texto: data.mensagem
+            }, true);
+        });
+
+        // Receber mensagem
+        socket.on('mensagem', (data) => {
+            adicionarMensagem(data);
+
+            // Notificação sonora (opcional)
+            if (data.username !== username) {
+                playNotificationSound();
+            }
+        });
+
+        // Utilizador entrou
+        socket.on('utilizadorEntrou', (data) => {
+            adicionarMensagem(data, true);
+        });
+
+        // Utilizador saiu
+        socket.on('utilizadorSaiu', (data) => {
+            adicionarMensagem(data, true);
+        });
+
+        // Atualizar lista de utilizadores
+        socket.on('listaUtilizadores', (utilizadores) => {
+            atualizarListaUtilizadores(utilizadores);
+        });
+
+        // Alguém está a escrever
+        socket.on('typing', (username) => {
+            mostrarTyping(username);
+        });
+
+        // Parou de escrever
+        socket.on('stopTyping', () => {
+            esconderTyping();
+        });
+    }
+
+    // SOLUÇÃO TODO 3: Função para enviar mensagem
+    function enviarMensagem() {
+        const input = document.getElementById('inputMsg');
+        const texto = input.value.trim();
+
+        if (texto === '') return;
+
+        // Comandos especiais
+        if (texto === '/clear') {
+            document.getElementById('mensagens').innerHTML = '';
+            input.value = '';
+            return;
+        }
+
+        // Emitir mensagem
+        socket.emit('mensagem', {
+            texto: texto
+        });
+
+        // Limpar input
+        input.value = '';
+        input.focus();
+
+        // Parar indicador de typing
+        socket.emit('stopTyping');
+    }
+
+    // SOLUÇÃO TODO 4: Adicionar mensagem ao chat
+    function adicionarMensagem(data, isSistema = false) {
+        const div = document.getElementById('mensagens');
+        const mensagemDiv = document.createElement('div');
+
+        if (isSistema) {
+            mensagemDiv.className = 'mensagem mensagem-sistema';
+            mensagemDiv.textContent = data.texto;
+        } else {
+            mensagemDiv.className = 'mensagem';
+
+            // Destacar próprias mensagens
+            if (data.username === username) {
+                mensagemDiv.style.background = '#e8eaf6';
+            }
+
+            mensagemDiv.innerHTML = `
+                    <div class="mensagem-header">
+                        <span class="mensagem-username">${escapeHtml(data.username)}</span>
+                        <span class="mensagem-hora">${data.hora}</span>
+                    </div>
+                    <div class="mensagem-texto">${escapeHtml(data.texto)}</div>
+                `;
+        }
+
+        div.appendChild(mensagemDiv);
+        div.scrollTop = div.scrollHeight; // Scroll automático para o fim
+    }
+
+    // SOLUÇÃO TODO 5: Detectar quando está a escrever
+    document.getElementById('inputMsg')?.addEventListener('input', (e) => {
+        if (e.target.value.trim() !== '') {
+            socket.emit('typing', username);
+
+            // Limpar timer anterior
+            clearTimeout(typingTimer);
+
+            // Criar novo timer para parar o typing
+            typingTimer = setTimeout(() => {
+                socket.emit('stopTyping');
+            }, TYPING_TIMER_LENGTH);
+        } else {
+            socket.emit('stopTyping');
+        }
+    });
+
+    // Enviar com Enter
+    document.getElementById('inputMsg')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            enviarMensagem();
+        }
+    });
+
+    // Enter no login
+    document.getElementById('usernameInput')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            entrarChat();
+        }
+    });
+
+    // Funções auxiliares
+    function atualizarListaUtilizadores(utilizadores) {
+        const lista = document.getElementById('listaUtilizadores');
+        const count = document.getElementById('onlineCount');
+
+        lista.innerHTML = '';
+        count.textContent = utilizadores.length;
+
+        utilizadores.forEach(user => {
+            const userDiv = document.createElement('div');
+            userDiv.className = 'usuario-online';
+            userDiv.textContent = user;
+
+            // Destacar próprio utilizador
+            if (user === username) {
+                userDiv.style.background = '#e8eaf6';
+                userDiv.style.fontWeight = 'bold';
+            }
+
+            lista.appendChild(userDiv);
+        });
+    }
+
+    function mostrarTyping(user) {
+        const typingDiv = document.getElementById('typing');
+        typingDiv.textContent = `${user} está a escrever...`;
+    }
+
+    function esconderTyping() {
+        const typingDiv = document.getElementById('typing');
+        typingDiv.textContent = '';
+    }
+
+    function atualizarStatusConexao(online) {
+        const status = document.getElementById('statusConexao');
+        const dot = status.querySelector('.status-dot');
+
+        if (online) {
+            status.innerHTML = '<span class="status-dot"></span><span>Online</span>';
+        } else {
+            status.innerHTML = '<span class="status-dot offline"></span><span>Offline</span>';
+        }
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function playNotificationSound() {
+        // Criar beep simples (opcional)
+        try {
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = context.createOscillator();
+            const gainNode = context.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(context.destination);
+
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.3, context.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.1);
+
+            oscillator.start(context.currentTime);
+            oscillator.stop(context.currentTime + 0.1);
+        } catch (e) {
+            // Som não disponível
+        }
+    }
+</script>
+</body>
+</html>
