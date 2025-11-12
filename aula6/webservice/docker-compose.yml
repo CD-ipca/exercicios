@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    image: webservice-api
+    container_name: webservice-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file: .env
+    volumes:
+      - ./logs:/usr/src/app/logs
+    # Adicionar base de dados conforme necessário para futuras implementações
+    depends_on:
+      - db
+    networks:
+      - webservice-network
+  db:
+     image: postgres:14-alpine
+     container_name: webservice-db
+     restart: unless-stopped
+     ports:
+       - "5432:5432"
+     environment:
+       POSTGRES_PASSWORD: postgres
+       POSTGRES_USER: postgres
+       POSTGRES_DB: postgres
+     volumes:
+       - ./data:/var/lib/postgresql/data
+     networks:
+       - webservice-network
+
+networks:
+  webservice-network:
+    driver: bridge
+
+# volumes:
+#   postgres-data:
