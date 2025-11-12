@@ -10,7 +10,7 @@ services:
       - "3000:3000"
     env_file: .env
     volumes:
-      - ./logs:/usr/src/app/logs
+      - logs-data:/usr/src/app/logs
     # Adicionar base de dados conforme necessário para futuras implementações
     depends_on:
       - db
@@ -27,7 +27,7 @@ services:
        POSTGRES_USER: postgres
        POSTGRES_DB: postgres
      volumes:
-       - ./data:/var/lib/postgresql/data
+       - postgres-data:/var/lib/postgresql/data
      networks:
        - webservice-network
 
@@ -35,5 +35,6 @@ networks:
   webservice-network:
     driver: bridge
 
-# volumes:
-#   postgres-data:
+volumes:
+  postgres-data:
+  logs-data:
