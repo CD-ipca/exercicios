@@ -110,7 +110,7 @@ io.on('connection', (socket) => {
 
 server.listen(PORT, () => {
     console.log('═══════════════════════════════════════');
-    console.log(`🚀 Chat servidor rodando em http://localhost:${PORT}`);
+    console.log(`🚀 Chat servidor à escuta em http://localhost:${PORT}`);
     console.log('═══════════════════════════════════════');
     console.log('💡 Abra múltiplas abas para testar!');
     console.log('Pressione Ctrl+C para parar');

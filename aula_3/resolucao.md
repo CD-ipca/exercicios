@@ -98,7 +98,7 @@ server.on('error', (erro) => {
 ### Conceitos-Chave a Enfatizar
 
 1. **http.createServer()**: Função que cria instância do servidor HTTP
-2. **Request object**: Contém informações da requisição (url, method, headers)
+2. **Request object**: Contém informações da request (url, method, headers)
 3. **Response object**: Usado para enviar resposta ao cliente
 4. **res.writeHead()**: Define status code e headers
 5. **res.end()**: Finaliza resposta e envia ao cliente
@@ -124,7 +124,7 @@ const PORT = 3000;
 
 const server = http.createServer((req, res) => {
     
-    // Log da requisição
+    // Log da request
     console.log(`📨 ${req.method} ${req.url}`);
     
     // SOLUÇÃO TODO 1-5: Implementar rotas
@@ -244,7 +244,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+    console.log(`🚀 Servidor à escuta em http://localhost:${PORT}`);
     console.log('Rotas disponíveis:');
     console.log('  GET  /');
     console.log('  GET  /sobre');
@@ -379,7 +379,7 @@ app.use((err, req, res, next) => {
 
 // SOLUÇÃO TODO 9: Iniciar servidor
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor Express rodando em http://localhost:${PORT}`);
+    console.log(`🚀 Servidor Express à escuta em http://localhost:${PORT}`);
     console.log('\n📋 Endpoints disponíveis:');
     console.log('  GET    /');
     console.log('  GET    /sobre');

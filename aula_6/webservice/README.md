@@ -80,7 +80,7 @@ webservice-api/
    docker-compose up -d
    ```
 
-2. Verifique se os containers estão rodando:
+2. Verifique se os containers estão à escuta:
    ```bash
    docker-compose ps
    ```

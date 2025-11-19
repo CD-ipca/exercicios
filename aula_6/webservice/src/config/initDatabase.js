@@ -44,7 +44,7 @@ const createCategoriesTable = `
  * - description: Descrição do produto (opcional)
  * - price: Preço do produto (NUMERIC para precisão decimal)
  * - category_id: Chave estrangeira para a tabela categories
- * - stock: Quantidade em estoque (padrão: 0)
+ * - stock: Quantidade em stock (padrão: 0)
  * - created_at: Data de criação (preenchida automaticamente)
  * - updated_at: Data de última atualização (preenchida automaticamente)
  *

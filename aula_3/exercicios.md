@@ -96,13 +96,13 @@ const PORT = 3000;
 // O callback recebe dois parâmetros: request e response
 const server = http.createServer((req, res) => {
     
-    // TODO 2: Definir o status code e headers da resposta
+    // TODO 2: Definir o status code e headers da Response
     // Dica: Use res.writeHead(statusCode, headers)
     // Status: 200, Content-Type: 'text/html; charset=utf-8'
     
     
-    // TODO 3: Criar uma resposta HTML simples
-    // Dica: Use res.end() para enviar a resposta
+    // TODO 3: Criar uma Response HTML simples
+    // Dica: Use res.end() para enviar a response
     const html = `
         <!DOCTYPE html>
         <html>
@@ -118,7 +118,7 @@ const server = http.createServer((req, res) => {
         </html>
     `;
     
-    // Enviar a resposta (COMPLETAR ESTA LINHA)
+    // Enviar a response (COMPLETAR ESTA LINHA)
     
 });
 
@@ -161,7 +161,7 @@ const PORT = 3000;
 
 const server = http.createServer((req, res) => {
     
-    // TODO 1: Implementar diferentes respostas baseadas em req.url
+    // TODO 1: Implementar diferentes responses baseadas em req.url
     // Rotas a implementar:
     // - "/" → Página inicial
     // - "/sobre" → Página sobre
@@ -169,12 +169,12 @@ const server = http.createServer((req, res) => {
     // - Qualquer outra → 404 Not Found
     
     if (req.url === '/') {
-        // TODO 2: Completar resposta para página inicial
+        // TODO 2: Completar response para página inicial
         res.writeHead(/* COMPLETAR: status code */, { /* COMPLETAR: headers */ });
         res.end('<h1>Página Inicial</h1><p>Bem-vindo ao servidor Node.js!</p>');
         
     } else if (req.url === '/sobre') {
-        // TODO 3: Completar resposta para página sobre
+        // TODO 3: Completar response para página sobre
         // Deve retornar HTML com informações sobre o projeto
         
         
@@ -203,7 +203,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+    console.log(`🚀 Servidor à escuta em http://localhost:${PORT}`);
 });
 ```
 
@@ -410,7 +410,7 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`📋 API de Tarefas rodando em http://localhost:${PORT}`);
+    console.log(`📋 API de Tarefas à escuta em http://localhost:${PORT}`);
     console.log('Endpoints disponíveis:');
     console.log('  GET    /api/tarefas');
     console.log('  GET    /api/tarefas/:id');

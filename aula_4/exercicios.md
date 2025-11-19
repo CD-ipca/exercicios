@@ -91,7 +91,7 @@ const server = http.createServer((req, res) => {
     
     // TODO 2: Definir status code e headers
     
-    // TODO 3: Enviar resposta HTML
+    // TODO 3: Enviar response HTML
     
     
 });
@@ -157,7 +157,7 @@ const server = http.createServer((req, res) => {
         
         
     } 
-    // TODO 4: Implementar resposta 404 para rotas não encontradas
+    // TODO 4: Implementar response 404 para rotas não encontradas
     else {
         // COMPLETAR
         
@@ -166,7 +166,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+    console.log(`🚀 Servidor à escuta em http://localhost:${PORT}`);
     console.log('Rotas disponíveis:');
     console.log('  GET /');
     console.log('  GET /sobre');
@@ -265,7 +265,7 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`🚀 Chat servidor rodando em http://localhost:${PORT}`);
+    console.log(`🚀 Chat servidor à escuta em http://localhost:${PORT}`);
 });
 ```
 

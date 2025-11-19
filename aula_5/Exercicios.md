@@ -425,8 +425,8 @@ const servidor = http.createServer(async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     
     if (req.url === '/hash' && req.method === 'POST') {
-        // TODO 2: Processar requisição de hash
-        // 1. Ler corpo da requisição (req.on('data'))
+        // TODO 2: Processar request de hash
+        // 1. Ler corpo da request (req.on('data'))
         // 2. Parsear JSON
         // 3. Executar worker com os dados
         // 4. Retornar resultado

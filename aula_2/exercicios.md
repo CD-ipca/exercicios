@@ -323,11 +323,11 @@ const servidores = [
 function requisicao(servidor) {
     return new Promise((resolve) => {
         const inicio = Date.now();
-        console.log(`🌍 Requisição para ${servidor.nome}...`);
+        console.log(`🌍 Request para ${servidor.nome}...`);
         
         setTimeout(() => {
             const tempoReal = Date.now() - inicio;
-            console.log(`✅ Resposta de ${servidor.nome} em ${tempoReal}ms`);
+            console.log(`✅ Response de ${servidor.nome} em ${tempoReal}ms`);
             resolve({ servidor: servidor.nome, tempo: tempoReal });
         }, servidor.latencia);
     });
@@ -426,7 +426,7 @@ async function testar() {
     const sistema = new SistemaDistribuido(3); // 3 réplicas
     
     for (let i = 1; i <= 5; i++) {
-        console.log(`\n--- Requisição ${i} ---`);
+        console.log(`\n--- Request ${i} ---`);
         try {
             await sistema.processarComRedundancia(`Pedido ${i}`);
         } catch (erro) {

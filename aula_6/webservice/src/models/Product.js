@@ -38,7 +38,7 @@ class Product {
     }
 
     if (this.stock !== undefined && (isNaN(this.stock) || this.stock < 0)) {
-      errors.push('Estoque deve ser um número não-negativo');
+      errors.push('Stock deve ser um número não-negativo');
     }
 
     return errors;
